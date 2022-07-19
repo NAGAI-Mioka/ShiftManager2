@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">ShiftManager2</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">シフト入力</string>
+    <string name="title_dashboard">確定シフト確認</string>
 </resources>
