@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.shiftmanager2.R
 import com.example.shiftmanager2.databinding.FragmentHomeBinding
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarDay
@@ -14,6 +15,7 @@ import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.MonthHeaderFooterBinder
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.WeekFields
 import java.util.*
@@ -25,6 +27,8 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private var selectedDate: LocalDate? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +45,45 @@ class HomeFragment : Fragment() {
 
             // Called every time we need to reuse a container.
             override fun bind(container: DayViewContainer, day: CalendarDay) {
-                // この中で日ごとの表示を設定する
+                // この中で日ごとの表示などを設定する
+                container.day = day
+                view?.setOnClickListener {
+                    // Check the day owner as we do not want to select in or out dates.
+                    if (day.owner == DayOwner.THIS_MONTH) {
+                        // Keep a reference to any previous selection
+                        // in case we overwrite it and need to reload it.
+                        val currentSelection = selectedDate
+                        if (currentSelection == day.date) {
+                            // If the user clicks the same date, clear selection.
+                            selectedDate = null
+                            // Reload this date so the dayBinder is called
+                            // and we can REMOVE the selection background.
+                            calendarView.notifyDateChanged(currentSelection)
+                        } else {
+                            selectedDate = day.date
+                            // Reload the newly selected date so the dayBinder is
+                            // called and we can ADD the selection background.
+                            calendarView.notifyDateChanged(day.date)
+                            if (currentSelection != null) {
+                                // We need to also reload the previously selected
+                                // date so we can REMOVE the selection background.
+                                calendarView.notifyDateChanged(currentSelection)
+                            }
+                        }
+                    }
+                }
+                if (day.owner == DayOwner.THIS_MONTH) {
+                    // Show the month dates. Remember that views are recycled!
+                    container.textView.visibility = View.VISIBLE
+                    if (day.date == selectedDate) {
+                        // If this is the selected date, show a round background and change the text color.
+                        container.textView.setTextColor(Color.WHITE)
+                        //container.textView.setBackgroundResource(R.drawable.selection_background)
+                    }
+                } else {
+                    // Hide in and out dates
+                    container.textView.visibility = View.INVISIBLE
+                }
                 container.textView.text = day.date.dayOfMonth.toString()
                 container.textView.setTextColor(Color.BLACK)
                 if (day.date.dayOfWeek == DayOfWeek.SUNDAY) {
@@ -65,6 +107,9 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+
+
         calendarView.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthViewContainer> {
             override fun create(view: View) = MonthViewContainer(view)
             override fun bind(container: MonthViewContainer, month: CalendarMonth) {
@@ -74,6 +119,7 @@ class HomeFragment : Fragment() {
                 } ${month.year}"
             }
         }
+
         val currentMonth = YearMonth.now()
         val lastMonth = currentMonth.plusMonths(5)
         val firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
