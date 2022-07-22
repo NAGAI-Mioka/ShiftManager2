@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.shiftmanager2.R
 import com.example.shiftmanager2.databinding.FragmentHomeBinding
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarDay
@@ -44,55 +44,52 @@ class HomeFragment : Fragment() {
             override fun create(view: View) = DayViewContainer(view)
 
             // Called every time we need to reuse a container.
+            // 日付ごとの処理
             override fun bind(container: DayViewContainer, day: CalendarDay) {
-                // この中で日ごとの表示などを設定する
                 container.day = day
-                view?.setOnClickListener {
-                    // Check the day owner as we do not want to select in or out dates.
-                    if (day.owner == DayOwner.THIS_MONTH) {
-                        // Keep a reference to any previous selection
-                        // in case we overwrite it and need to reload it.
-                        val currentSelection = selectedDate
-                        if (currentSelection == day.date) {
-                            // If the user clicks the same date, clear selection.
-                            selectedDate = null
-                            // Reload this date so the dayBinder is called
-                            // and we can REMOVE the selection background.
+                // 日付がクリックされた時の処理
+                container.view.setOnClickListener {
+                    val toastText = container.day.date.toString()
+                    val toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT)
+                    toast.show()
+                    val currentSelection = selectedDate
+                    if (currentSelection == day.date) {
+                        // If the user clicks the same date, clear selection.
+                        selectedDate = null
+                        // Reload this date so the dayBinder is called
+                        // and we can REMOVE the selection background.
+                        calendarView.notifyDateChanged(currentSelection)
+                    } else {
+                        selectedDate = day.date
+                        // Reload the newly selected date so the dayBinder is
+                        // called and we can ADD the selection background.
+                        calendarView.notifyDateChanged(day.date)
+                        if (currentSelection != null) {
+                            // We need to also reload the previously selected
+                            // date so we can REMOVE the selection background.
                             calendarView.notifyDateChanged(currentSelection)
-                        } else {
-                            selectedDate = day.date
-                            // Reload the newly selected date so the dayBinder is
-                            // called and we can ADD the selection background.
-                            calendarView.notifyDateChanged(day.date)
-                            if (currentSelection != null) {
-                                // We need to also reload the previously selected
-                                // date so we can REMOVE the selection background.
-                                calendarView.notifyDateChanged(currentSelection)
-                            }
                         }
                     }
                 }
-                if (day.owner == DayOwner.THIS_MONTH) {
-                    // Show the month dates. Remember that views are recycled!
-                    container.textView.visibility = View.VISIBLE
-                    if (day.date == selectedDate) {
-                        // If this is the selected date, show a round background and change the text color.
-                        container.textView.setTextColor(Color.WHITE)
-                        //container.textView.setBackgroundResource(R.drawable.selection_background)
-                    }
-                } else {
-                    // Hide in and out dates
-                    container.textView.visibility = View.INVISIBLE
-                }
+
                 container.textView.text = day.date.dayOfMonth.toString()
-                container.textView.setTextColor(Color.BLACK)
-                if (day.date.dayOfWeek == DayOfWeek.SUNDAY) {
-                    container.textView.setTextColor(Color.RED)
-                }
-                if (day.date.dayOfWeek == DayOfWeek.SATURDAY) {
-                    container.textView.setTextColor(Color.BLUE)
-                }
-                if (day.owner != DayOwner.THIS_MONTH) {
+                // 今月の日付について
+                if (day.owner == DayOwner.THIS_MONTH) {
+                    // 基本の文字色
+                    when (day.date.dayOfWeek) {
+                        DayOfWeek.SUNDAY -> {
+                            container.textView.setTextColor(Color.RED)
+                        }
+                        DayOfWeek.SATURDAY -> {
+                            container.textView.setTextColor(Color.BLUE)
+                        }
+                        else -> {
+                            container.textView.setTextColor(Color.BLACK)
+                        }
+                    }
+                // 今月以外の日付について
+                } else {
+                    // 基本の文字色
                     when (day.date.dayOfWeek) {
                         DayOfWeek.SUNDAY -> {
                             container.textView.setTextColor(Color.rgb(240, 170, 170))
@@ -104,6 +101,14 @@ class HomeFragment : Fragment() {
                             container.textView.setTextColor(Color.GRAY)
                         }
                     }
+                }
+                // 選択された日について
+                if (day.date == selectedDate) {
+                    // If this is the selected date, show a round background and change the text color.
+                    container.textView.setBackgroundColor(Color.YELLOW)
+                    //container.textView.setBackgroundResource(R.drawable.selection_background)
+                } else {
+                    container.textView.background = null
                 }
             }
         }
