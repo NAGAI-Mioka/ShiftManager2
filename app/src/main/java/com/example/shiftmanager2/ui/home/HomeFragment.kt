@@ -14,6 +14,7 @@ import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.MonthHeaderFooterBinder
+import com.kizitonwose.calendarview.utils.yearMonth
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -49,7 +50,8 @@ class HomeFragment : Fragment() {
                 container.day = day
                 // 日付がクリックされた時の処理
                 container.view.setOnClickListener {
-                    val toastText = container.day.date.toString()
+                    //val toastText = container.day.date.toString()
+                    val toastText = selectedDate.toString()
                     val toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT)
                     toast.show()
                     val currentSelection = selectedDate
@@ -58,16 +60,23 @@ class HomeFragment : Fragment() {
                         selectedDate = null
                         // Reload this date so the dayBinder is called
                         // and we can REMOVE the selection background.
-                        calendarView.notifyDateChanged(currentSelection)
+                        calendarView.notifyMonthChanged(day.date.yearMonth.plusMonths(1))
+                        calendarView.notifyMonthChanged(day.date.yearMonth)
+                        calendarView.notifyMonthChanged(day.date.yearMonth.minusMonths(1))
                     } else {
                         selectedDate = day.date
                         // Reload the newly selected date so the dayBinder is
                         // called and we can ADD the selection background.
-                        calendarView.notifyDateChanged(day.date)
+
+                        calendarView.notifyMonthChanged(day.date.yearMonth.plusMonths(1))
+                        calendarView.notifyMonthChanged(day.date.yearMonth)
+                        calendarView.notifyMonthChanged(day.date.yearMonth.minusMonths(1))
                         if (currentSelection != null) {
                             // We need to also reload the previously selected
                             // date so we can REMOVE the selection background.
-                            calendarView.notifyDateChanged(currentSelection)
+                            calendarView.notifyMonthChanged(currentSelection.yearMonth.plusMonths(1))
+                            calendarView.notifyMonthChanged(currentSelection.yearMonth)
+                            calendarView.notifyMonthChanged(currentSelection.yearMonth.minusMonths(1))
                         }
                     }
                 }
@@ -102,10 +111,12 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
+
                 // 選択された日について
                 if (day.date == selectedDate) {
                     // If this is the selected date, show a round background and change the text color.
                     container.textView.setBackgroundColor(Color.YELLOW)
+
                     //container.textView.setBackgroundResource(R.drawable.selection_background)
                 } else {
                     container.textView.background = null
