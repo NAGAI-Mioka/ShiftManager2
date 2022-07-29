@@ -2,4 +2,8 @@
     <string name="app_name">ShiftManager2</string>
     <string name="title_home">シフト入力</string>
     <string name="title_dashboard">確定シフト確認</string>
+    <string name="shift_start">開始時刻</string>
+    <string name="shift_end">終了時刻</string>
+    <string name="apply">適用</string>
+    <string name="delete">シフト削除</string>
 </resources>
