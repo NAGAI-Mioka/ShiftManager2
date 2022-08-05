@@ -6,4 +6,6 @@
     <string name="shift_end">終了時刻</string>
     <string name="apply">適用</string>
     <string name="delete">シフト削除</string>
+    <string name="cancel">戻る</string>
+    <string name="from_to">~</string>
 </resources>

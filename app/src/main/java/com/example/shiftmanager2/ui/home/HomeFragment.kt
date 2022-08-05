@@ -50,12 +50,15 @@ class HomeFragment : Fragment() {
                 container.day = day
                 // 日付がクリックされた時の処理
                 container.view.setOnClickListener {
-                    //val toastText = container.day.date.toString()
-                    //val toastText = selectedDate.toString()
-                    //val toast = Toast.makeText(context, toastText, Toast.LENGTH_SHORT)
-                    //toast.show()
+                    // ダイアログ生成
                     val newFragment = ShiftDialogFragment()
+                    // バンドル作成＆バンドルをアーグメントに与える
+                    val args = Bundle()
+                    args.putString("date", day.date.toString())
+                    newFragment.arguments = args
+                    // 表示
                     newFragment.show(childFragmentManager, "game")
+
                     val currentSelection = selectedDate
                     if (currentSelection == day.date) {
                         // If the user clicks the same date, clear selection.
