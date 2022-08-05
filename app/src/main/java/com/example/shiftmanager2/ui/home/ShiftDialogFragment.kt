@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.shiftmanager2.R
 import java.util.*
@@ -30,11 +31,14 @@ class ShiftDialogFragment : DialogFragment() {
 
             val shiftStart = view.findViewById<EditText>(R.id.shift_start)
             shiftStart.setOnClickListener {
+                // 開始時刻を押した時の動作
+                Toast.makeText(context, "test", Toast.LENGTH_SHORT).show()
                 val tp = TimePick()
                 tp.show(childFragmentManager, "timePicker")
             }
             val shiftEnd = view.findViewById<EditText>(R.id.shift_end)
             shiftStart.setOnClickListener {
+                // 終了時刻を押した時の動作
 
             }
 
